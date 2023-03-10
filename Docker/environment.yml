@@ -1,0 +1,15 @@
+# You can use this file to create a conda environment for this pipeline:
+#   conda env create -f environment.yml
+name: KSK_acgt
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+  - r
+dependencies:
+  - pandas>=0.24.2
+  - numpy>=1.16.2
+  - argparse
+  - pyvcf>=0.6.8
+  - cyvcf2=0.10
+  - h5py
