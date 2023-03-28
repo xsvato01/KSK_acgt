@@ -11,7 +11,7 @@ process CRAWL_ACGT {
 	script:
 	"""
 	touch ${Chr}.csv
- python $params.get_csvs --hdf5_dir /mnt/shared/MedGen/ACGTdatabase/data/hdf5/all_chr_10k/ --chr ${Chr}
+ python $params.get_csvs --chr ${Chr} --bed_genome ${params.bedpath} --gene_list ${params.geny_ksk}
 	"""
 }
 
