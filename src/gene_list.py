@@ -104,7 +104,7 @@ if __name__ == "__main__":
                              right_on='Name', how='left').sort_values(by=["Chromosome", "Start"])
     genesByChrom = merged.groupby(by=["Chromosome"]).agg(
         {"genes": list}).reset_index()
-
+    
     if not args.chr in list(genesByChrom["Chromosome"]):
         print(f"Chromosmome {args.chr} is not in list of analysed genes")
         exit()
