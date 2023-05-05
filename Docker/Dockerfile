@@ -1,4 +1,4 @@
-FROM condaforge/mambaforge
+FROM condaforge/mambaforge:22.9.0-1
 
 ENV INSTALL_DIR="/opt"
 
