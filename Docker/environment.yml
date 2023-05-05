@@ -6,10 +6,9 @@ channels:
   - bioconda
   - defaults
   - r
+  - anaconda
 dependencies:
   - pandas>=0.24.2
   - numpy>=1.16.2
   - argparse
-  - pyvcf>=0.6.8
-  - cyvcf2=0.10
   - h5py
