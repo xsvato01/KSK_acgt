@@ -8,11 +8,11 @@ RUN apt-get update; export DEBIAN_FRONTEND=noninteractive; apt-get -y --no-insta
    build-essential \
    gcc-multilib \
    libssl1.0.0 \
-   pip3 \
+   pip \
    netcat-openbsd && \
    export DEBIAN_FRONTEND=noninteractive; apt-get -y install openssh-client openssh-sftp-server openssh-server
 
-RUN pip3 install --target=/opt/conda/envs/KSK_acgt/bin myvariant liftover omim
+RUN pip install --target=/opt/conda/envs/KSK_acgt/bin myvariant liftover omim flask_sqlalchemy
 
 # Install miniconda
 #ENV CONDA_DIR /opt/conda
