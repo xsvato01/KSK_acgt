@@ -23,7 +23,8 @@ RUN pip install --target=/opt/conda/envs/KSK_acgt/bin myvariant liftover omim fl
 #ENV PATH=$CONDA_DIR/bin:$PATH
 # Install the conda environment
 COPY environment.yml /
-RUN mamba env create -f /environment.yml && conda clean --all -f -y
+RUN mamba env create -f /environment.yml
+# && conda clean --all -f -y
 # Add conda installation dir to PATH (instead of doing 'conda activate')
 ENV PATH /opt/conda/envs/KSK_acgt/bin:$PATH
 
