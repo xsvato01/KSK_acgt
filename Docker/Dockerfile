@@ -35,5 +35,5 @@ ENV PATH /opt/conda/envs/KSK_acgt/bin:$PATH
 
 
 
-RUN ln -s /opt/conda/envs/KSK_acgt/lib/libcrypto.so.1.1 /opt/conda/envs/KSK_acgt/lib/libcrypto.so.1.0.0
+#RUN ln -s /opt/conda/envs/KSK_acgt/lib/libcrypto.so.1.1 /opt/conda/envs/KSK_acgt/lib/libcrypto.so.1.0.0
 USER 1000
