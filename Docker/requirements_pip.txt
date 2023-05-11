@@ -1,0 +1,10 @@
+# You can use this file to install dependencies with pip:
+#   pip install -r requirements.txt
+pandas>=0.24.2
+numpy>=1.16.2
+argparse
+h5py
+myvariant
+liftover
+omim
+flask_sqlalchemy
