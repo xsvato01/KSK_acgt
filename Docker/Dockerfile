@@ -13,10 +13,10 @@ RUN apt-get update; export DEBIAN_FRONTEND=noninteractive; apt-get -y --no-insta
    export DEBIAN_FRONTEND=noninteractive; apt-get -y install openssh-client openssh-sftp-server openssh-server
 
 #RUN pip install --target=/opt/conda/envs/KSK_acgt/bin myvariant liftover omim flask_sqlalchemy
-COPY requirements.txt /
+COPY requirements_pip.txt /
 
 
-RUN pip install -r requirements.txt --target=/opt/conda/envs/KSK_acgt/bin
+RUN pip install -r requirements_pip.txt --target=/opt/conda/envs/KSK_acgt/bin
 
 
 # Install miniconda
