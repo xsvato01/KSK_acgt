@@ -1,28 +1,53 @@
-import myvariant
-from liftover import get_lifter
-import omim
-from omim.db import Manager, OMIM_DATA
-import pandas as pd
-import argparse
+# import sys
+# # hot fix till container not build
+# sys.path.append('/opt/conda/lib/python3.10/site-packages/')
+
 import os
+import sys
+import argparse
+import pandas as pd
+from omim.db import Manager, OMIM_DATA
+import omim
+from liftover import get_lifter
+import myvariant
 
 manager = Manager(dbfile=omim.DEFAULT_DB)
 mv = myvariant.MyVariantInfo()
 
 
-def main(filename):
+def main(filename, file):
     chrom = filename
-    csv = pd.read_csv(filename, sep="\t")
-    converter = get_lifter('hg38', 'hg19')
+    csv = pd.read_csv(file, sep="\t")
+    converter = get_lifter('hg38', 'hg19', '/tmp/')
     final_list = []
     for index, row in csv.iterrows():
+        print(index)
+
         hg19_cors = converter[chrom][row.Pos]
         row['clinical_significance'] = []
         row['NM_HGVSc'] = list()
         HGVSc = ""
+        if index == 0 or csv.loc[index-1].Gene != row.Gene:
+            omim_vars = manager.query(
+                OMIM_DATA, 'ensembl_gene_id', row.Gene).all()
+            if omim_vars and omim_vars[0].geneMap:
+                omim_parsed = eval(omim_vars[0].geneMap)
+                gene_phenotype = ', '.join(
+                    [x['Phenotype'] for x in omim_parsed])
+                gene_inheritance = ', '.join(
+                    [x['Inheritance'] for x in omim_parsed])
+            else:
+                gene_phenotype = '?'
+                gene_inheritance = '?'
+
+        print(row.Pos)
+        print(hg19_cors)
         var_dbs = False  # getvariant does not return False/empty object
+        # var_dbs = mv.getvariant(
+        #     f'{hg19_cors[0][0]}:g.{hg19_cors[0][1]}{row.Ref}>{row.Alt}')
+
         var_dbs = mv.getvariant(
-            f'{hg19_cors[0][0]}:g.{hg19_cors[0][1]}{row.Ref}>{row.Alt}')
+            f'{hg19_cors[0][0]}:g.{hg19_cors[0][1]}{row.Ref}>{row.Alt}') if hg19_cors else False
 
         if var_dbs and var_dbs.get('clinvar'):
             row['NM_HGVSc'] = [x for x in var_dbs['clinvar']['hgvs']["coding"]
@@ -50,27 +75,14 @@ def main(filename):
                 row['NM_HGVSc'].append(HGVSc)
             row['NM_HGVSc'] = set(row.NM_HGVSc)
 
-        if index == 0 or csv.loc[index-1].Gene != row.Gene:
-            omim_vars = manager.query(
-                OMIM_DATA, 'ensembl_gene_id', row.Gene).all()
-            if omim_vars:
-                omim_parsed = eval(omim_vars[0].geneMap)
-                gene_phenotype = ', '.join(
-                    [x['Phenotype'] for x in omim_parsed])
-                gene_inheritance = ', '.join(
-                    [x['Inheritance'] for x in omim_parsed])
-            else:
-                gene_phenotype = '?'
-                gene_inheritance = '?'
-
         row['NM_HGVSc'] = ', '.join(row['NM_HGVSc'])
         row['gene_phenotype'] = gene_phenotype
         row['gene_inheritance'] = gene_inheritance
         final_list.append(row)
 
     pd_final_list = pd.DataFrame(final_list)
-    pd_final_list.insert(4, 'ACGT_percentage',
-                         pd_final_list.pop('ACGT_percentage'))
+    pd_final_list.insert(4, 'ACGT_freq',
+                         pd_final_list.pop('ACGT_freq'))
     pd_final_list.insert(5, 'NM_HGVSc', pd_final_list.pop('NM_HGVSc'))
     pd_final_list.insert(6, 'clinical_significance',
                          pd_final_list.pop('clinical_significance'))
@@ -86,12 +98,14 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Extend HDF with custom settings for KSK")
     parser.add_argument(
-        '--filename', help='Input filename no extension aka Chrom', default='2', required=False)
+        '--filename', help='Input filename no extension aka Chrom', default='2', required=True)
+    parser.add_argument(
+        '--filepath', help='Input filepath', required=True)
     args = parser.parse_args()
 
-    if os.stat(args.filename).st_size == 0:
+    if os.stat(args.filepath).st_size == 0:
         print("OS stat 0")
-        exit()
-
-    out_df = main(args.filename)
+        out_df = pd.DataFrame()
+    else:
+        out_df = main(args.filename, args.filepath)
     out_df.to_csv(f"{args.filename}_appended.tsv", index=False, sep="\t")

@@ -1,36 +1,38 @@
 
 process CRAWL_ACGT {
 	tag "Getting KSK on $Chr using $task.cpus CPUs and $task.memory memory"
-	publishDir  "${launchDir}/perChr_allelicFreq", mode:'copy'
+	publishDir  "${launchDir}/perChr_Allele_appended_info", mode:'copy'
 	input:
 	val Chr
 
  output:
- path '*.tsv'
+ tuple val (Chr), path ("*.tsv")
 
 	script:
 	"""
 	touch ${Chr}.tsv
- python $params.get_csvs --chr ${Chr} --bed_genome ${params.bedpath} --gene_list ${params.geny_ksk} --hdf5_dir /mnt/shared/MedGen/ACGTdatabase/data/hdf5_variants_673samp/
+ python $params.get_csvs --chr ${Chr} --bed_genome ${params.bedpath} --gene_list ${params.geny_ksk}
 	"""
+	// /mnt/shared/MedGen/ACGTdatabase/data/hdf5_variants_673samp/
 }
 
-process CRAWL_ACGT {
-	tag "Getting KSK on $Chr using $task.cpus CPUs and $task.memory memory"
+process APPEND_INFO {
+	tag "Getting KSK on $Name using $task.cpus CPUs and $task.memory memory"
 	publishDir  "${launchDir}/perChr_allelicFreq", mode:'copy'
 	input:
-	val Chr
+ tuple val(Name), path(FilePath)
 
  output:
- path '*.tsv'
+ path "*"
 
 	script:
 	"""
-	touch ${Chr}_appended.tsv
- python $params.get_additional --input_filename ${Chr}
+ python $params.get_additional --filename ${Name} --filepath ${FilePath}
 	"""
 }
 
+
+//not used anymore:
 process MERGE_FILES {
 	tag "Merging KSK files using $task.cpus CPUs and $task.memory memory"
 	publishDir  "${launchDir}", mode:'copy'

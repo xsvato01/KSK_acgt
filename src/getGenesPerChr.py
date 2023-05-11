@@ -7,4 +7,4 @@ merged = gene_list.merge(bed_list, left_on='genes',
                          right_on='Name', how='left').sort_values(by=["Chromosome", "Start"])
 genesByChrom = merged.groupby(by=["Chromosome"]).agg(
     {"genes": list}).reset_index()
-result.to_csv("GenesPerChr.csv")
+genesByChrom.to_csv("GenesPerChr.csv")
