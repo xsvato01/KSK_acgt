@@ -11,14 +11,14 @@ process CRAWL_ACGT {
 	script:
 	"""
 	touch ${Chr}.tsv
- python $params.get_csvs --chr ${Chr} --bed_genome ${params.bedpath} --gene_list ${params.geny_ksk}
+ python $params.get_csvs --chr ${Chr} --bed_genome ${params.bedpath} --gene_list ${params.geny_ksk} --hdf5_dir /mnt/shared/MedGen/ACGTdatabase/data/hdf5_variants_673samp/
 	"""
 	// /mnt/shared/MedGen/ACGTdatabase/data/hdf5_variants_673samp/
 }
 
 process APPEND_INFO {
 	tag "Getting KSK on $Name using $task.cpus CPUs and $task.memory memory"
-	publishDir  "${launchDir}/perChr_allelicFreq", mode:'copy'
+	publishDir  "${launchDir}/perChr_Allele_appended_info", mode:'copy'
 	input:
  tuple val(Name), path(FilePath)
 
